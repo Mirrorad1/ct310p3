@@ -1,0 +1,108 @@
+<?php
+/**
+ * Demo for CT310
+ */
+class Controller_Login extends Controller
+{
+	/**
+	 * Shows a list of all demo items
+	 */
+	
+	public function action_loginForm()
+	{
+		$status = 'success';
+
+		$content = View::forge('login/login');
+
+		$content -> set_safe('status',$status);
+
+		return $content;
+	}
+
+public function action_checkLogin()
+	{
+		$data = array();
+		$username = Input::post('username');
+		$username2 = Input::post('username');
+		$password = Input::post('password');
+		//username and password same for now
+		$ct310 = $username2 === 'ct310' && md5($password) === 'a6cebbf02cc311177c569525a0f119d7';
+		$user1 = $username2 === 'mirrorad' && md5($password) === 'd0763edaa9d9bd2a9516280e9044d885';
+		$user2 = $username2 === 'saurav' && md5($password) === '8cf674180ea201eb14b12486eaef9f28';
+		$user3 = $username === 'aaronper' && md5($password) === '449a36b6689d841d7d27f31b4b7cc73a';
+		$user4 = $username2 === 'aaronadmin' && md5($password) === 'd31bfd85d0a81046f70304ebfecdffbf';
+		$user5 = $username === 'bsay' && md5($password) === '790f6b6cf6a6fbead525927d69f409fe';
+		
+			if($user3 || $user5)
+		{
+			Session::create(); 
+			Session::set('username', $username);
+			Session::set('userid', 12345);
+			$this->template->title = 'Login';
+			$this->template->content = View::forge('posts/success', $data);
+		}
+		
+		elseif($ct310 || $user4 || $user2 || $user1)
+		{
+			Session::create();
+			Session::set('username', $username2);
+			Session::set('userid', 12346);
+			$this->template->title = 'Login';
+			$this->template->content = View::forge('posts/success', $data);
+	}
+		else 
+		{
+			$this->template->title='Login';
+			$this->template->content = View::forge('posts/loginForm', $data);
+			$this->template->content->set_safe('status','error');
+		}
+	}
+	
+		public function action_register(){
+		$data = array();
+		$this->template->title = 'Register';
+		$this->template->content = View::forge('register/register', $data);
+	
+	}
+
+	public function action_printUserDetails()
+	{
+		$session = Session::instance(); 
+		
+		$username = $session->get('username');
+
+		$id = $session->get('userid');
+		
+		if(isset($username) && isset($id))
+		{
+
+			$content = View::forge('login/print');
+		
+			$content->set_safe('username',$username);
+	
+			$content->set_safe('id',$id);
+		
+			return $content;
+		
+		}
+		else
+		{
+			$content = View::forge('login/notLoggedIn');
+		
+			return $content;
+		}
+		
+	}
+
+	public function action_logout()
+	{
+		$session = Session::instance(); 
+
+		$session->destroy();
+
+		$content = View::forge('login/logout');
+
+		return $content;
+	}
+
+}
